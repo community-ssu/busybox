@@ -1,0 +1,63 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 99-unnamed.dpatch by Yauheni Kaliuta <yauheni.kaliuta@nokia.com>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+@DPATCH@
+diff --git a/archival/Config.in b/archival/Config.in
+index 8d31ec7..a3ff732 100644
+--- a/archival/Config.in
++++ b/archival/Config.in
+@@ -239,6 +239,13 @@ config FEATURE_TAR_LONG_OPTIONS
+ 	help
+ 		Enable use of long options, increases size by about 400 Bytes
+ 
++config FEATURE_TAR_TOUCH
++	bool "Enable ignoring touch option"
++	default n
++	depends on TAR
++	help
++	  Allows compatibility with -m / --touch command line option.
++ 
+ config UNCOMPRESS
+ 	bool "uncompress"
+ 	default n
+diff --git a/archival/tar.c b/archival/tar.c
+index 5b19093..9e9cff6 100644
+--- a/archival/tar.c
++++ b/archival/tar.c
+@@ -713,6 +713,7 @@ enum {
+ 	USE_FEATURE_TAR_COMPRESS(OPTBIT_COMPRESS    ,)
+ 	OPTBIT_NOPRESERVE_OWN,
+ 	OPTBIT_NOPRESERVE_PERM,
++	USE_FEATURE_TAR_TOUCH(   OPTBIT_TOUCH       ,)
+ 	OPT_TEST         = 1 << 0, // t
+ 	OPT_EXTRACT      = 1 << 1, // x
+ 	OPT_BASEDIR      = 1 << 2, // C
+@@ -731,6 +732,7 @@ enum {
+ 	OPT_COMPRESS     = USE_FEATURE_TAR_COMPRESS((1<<OPTBIT_COMPRESS    )) + 0, // Z
+ 	OPT_NOPRESERVE_OWN  = 1 << OPTBIT_NOPRESERVE_OWN , // no-same-owner
+ 	OPT_NOPRESERVE_PERM = 1 << OPTBIT_NOPRESERVE_PERM, // no-same-permissions
++	OPT_TOUCH        = USE_FEATURE_TAR_TOUCH(   (1<<OPTBIT_TOUCH       )) + 0, // m
+ };
+ #if ENABLE_FEATURE_TAR_LONG_OPTIONS
+ static const char tar_longopts[] ALIGN1 =
+@@ -770,6 +772,9 @@ static const char tar_longopts[] ALIGN1 =
+ # if ENABLE_FEATURE_TAR_FROM
+ 	"exclude\0"             Required_argument "\xff"
+ # endif
++# if ENABLE_FEATURE_TAR_TOUCH
++	"touch\0"               No_argument       "m"
++# endif
+ 	;
+ #endif
+ 
+@@ -814,6 +819,7 @@ int tar_main(int argc, char **argv)
+ 		USE_FEATURE_TAR_FROM(    "T:X:")
+ 		USE_FEATURE_TAR_GZIP(    "z"   )
+ 		USE_FEATURE_TAR_COMPRESS("Z"   )
++		USE_FEATURE_TAR_TOUCH(   "m"   )
+ 		, &base_dir // -C dir
+ 		, &tar_filename // -f filename
+ 		USE_FEATURE_TAR_FROM(, &(tar_handle->accept)) // T

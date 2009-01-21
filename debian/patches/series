@@ -4,3 +4,9 @@ mount-relatime.patch
 applets-fallback.patch
 version.patch
 init-console.patch
+03tar.dpatch
+05thumb.dpatch
+06ls.dpatch
+fsync.patch
+busybox-zero-ifr.ifr_hwaddr.sa_data.patch
+

@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 99-unnamed.dpatch by Yauheni Kaliuta <yauheni.kaliuta@nokia.com>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+@DPATCH@
+diff --git a/coreutils/ls.c b/coreutils/ls.c
+index 067e463..39aa63e 100644
+--- a/coreutils/ls.c
++++ b/coreutils/ls.c
+@@ -431,6 +431,7 @@ static void showfiles(struct dnode **dn, int nfiles)
+ 			}
+ 		}
+ 		putchar('\n');
++		fflush(NULL);
+ 		column = 0;
+ 	}
+ }

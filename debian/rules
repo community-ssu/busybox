@@ -10,6 +10,13 @@ VERSION := $(shell echo "$(VERSION_DEBIAN)" | sed -e 's,^[^:]*:,,' -e 's,-[^-]*$
 BUILD_DIR = debian/build
 STAMPS_DIR = debian/stamps
 
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	CONFIG_DEBUG = y
+endif
+ifneq (,$(findstring thumb,$(DEB_BUILD_OPTIONS)))
+THUMB := -mthumb
+endif
+
 source: $(STAMPS_DIR)/source
 
 $(STAMPS_DIR)/source: SOURCE_FILES = $(filter-out debian, $(wildcard * .[^.]*))
@@ -22,7 +29,8 @@ $(STAMPS_DIR)/source:
 	cd $(DIR); QUILT_PATCHES=$(CURDIR)/debian/patches quilt --quiltrc /dev/null push -a || test $$? = 2
 	touch $@
 
-setup: $(STAMPS_DIR)/setup_deb $(STAMPS_DIR)/setup_udeb
+#setup: $(STAMPS_DIR)/setup_deb $(STAMPS_DIR)/setup_udeb
+setup: $(STAMPS_DIR)/setup_maemo
 
 $(STAMPS_DIR)/setup_%: SOURCE_DIR=$(BUILD_DIR)/source
 $(STAMPS_DIR)/setup_%: DIR=$(BUILD_DIR)/build_$*
@@ -34,13 +42,19 @@ $(STAMPS_DIR)/setup_%: $(STAMPS_DIR)/source
 	make -C '$(DIR)' oldconfig
 	touch $@
 
-build: $(STAMPS_DIR)/build_deb $(STAMPS_DIR)/build_static $(STAMPS_DIR)/build_udeb
+#build: $(STAMPS_DIR)/build_deb $(STAMPS_DIR)/build_static $(STAMPS_DIR)/build_udeb
+build: $(STAMPS_DIR)/build_maemo
 
+$(STAMPS_DIR)/build_maemo : debian/sfdisk/sfdisk
 $(STAMPS_DIR)/build_%: DIR=$(BUILD_DIR)/build_$*
 $(STAMPS_DIR)/build_%: $(STAMPS_DIR)/setup_%
 	dh_testdir
-	make -C '$(DIR)' busybox docs/busybox.1 BB_EXTRA_VERSION="$(shell lsb_release -is) $(VERSION_DEBIAN)"
+	make -C '$(DIR)' THUMB=$(THUMB) busybox docs/busybox.1 BB_EXTRA_VERSION="$(shell lsb_release -is) $(VERSION_DEBIAN)"
+	make -C '$(DIR)' busybox.links
 	touch $@
+
+debian/sfdisk/sfdisk:
+	$(MAKE) -C debian/sfdisk
 
 $(BUILD_DIR) $(STAMPS_DIR):
 	@[ -d $@ ] || mkdir $@
@@ -51,11 +65,26 @@ maintainerclean:
 clean:
 	dh_testdir
 	rm -rf $(BUILD_DIR) $(STAMPS_DIR)
+	$(MAKE) -C debian/sfdisk clean
 	dh_clean
 
 binary-indep:
 
-binary-arch: binary-arch_deb binary-arch_static binary-arch_udeb
+#binary-arch: binary-arch_deb binary-arch_static binary-arch_udeb
+binary-arch: binary-arch_maemo
+
+binary-arch_maemo: DIR = $(BUILD_DIR)/build_maemo
+binary-arch_maemo: DH_OPTIONS = -pbusybox
+binary-arch_maemo: $(STAMPS_DIR)/build_maemo
+	dh_testdir
+	dh_testroot
+	dh_clean -k -d
+	install -D -m755 debian/sfdisk/sfdisk debian/busybox/sbin/sfdisk
+	install -D -m755 debian/local/tempfile debian/busybox/bin/tempfile
+	install -D -m755 $(DIR)/busybox_unstripped debian/busybox/bin/busybox
+	sed -e 's,^/,bin/busybox ,' $(DIR)/busybox.links | grep -v linuxrc >  debian/busybox.links
+
+	$(MAKE) -f debian/rules binary-arch_all
 
 binary-arch_deb: DIR = $(BUILD_DIR)/build_deb
 binary-arch_deb: export DH_OPTIONS = -pbusybox
@@ -96,7 +125,7 @@ binary-arch_all:
 	dh_installdirs
 	dh_installdocs
 	dh_installchangelogs
-	dh_strip
+	dh_strip --dbg-package=busybox-dbg
 	dh_link
 	dh_compress
 	dh_fixperms

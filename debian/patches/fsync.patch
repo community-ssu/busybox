@@ -1,0 +1,110 @@
+Index: busybox/coreutils/fsync.c
+===================================================================
+--- busybox/coreutils/fsync.c	(revision 0)
++++ busybox/coreutils/fsync.c	(revision 0)
+@@ -0,0 +1,46 @@
++/* vi: set sw=4 ts=4: */
++/*
++ * Mini fsync implementation for busybox
++ *
++ * Copyright (C) 2008 Nokia Corporation. All rights reserved.
++ *
++ * Licensed under GPLv2 or later, see file LICENSE in this tarball for details.
++ */
++
++#include "libbb.h"
++
++/* This is a NOFORK applet. Be very careful! */
++
++int fsync_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
++int fsync_main(int argc, char **argv)
++{
++	int status = EXIT_SUCCESS;
++	int flags;
++	int fd;
++	char *path;
++
++	flags = getopt32(argv, "d"); /* fdatasync */
++	argv += optind;
++
++	if (!*argv) {
++		bb_show_usage();
++	}
++
++	for (path = *argv++; path; path = *argv++) {
++		fd = open(path, O_NOATIME | O_NOCTTY | O_RDONLY);
++
++		if (fd == -1) {
++			bb_simple_perror_msg(path);
++			status = EXIT_FAILURE;
++			continue;
++		}
++		
++		if ((flags ? fdatasync(fd) : fsync(fd)) == -1) {
++			bb_simple_perror_msg(path);
++		}
++
++		close(fd);
++	}
++
++	return status;
++}
+Index: busybox/coreutils/Kbuild
+===================================================================
+--- busybox/coreutils/Kbuild	(revision 23238)
++++ busybox/coreutils/Kbuild	(working copy)
+@@ -36,6 +36,7 @@
+ lib-$(CONFIG_EXPAND)    += expand.o
+ lib-$(CONFIG_FALSE)     += false.o
+ lib-$(CONFIG_FOLD)      += fold.o
++lib-$(CONFIG_FSYNC)     += fsync.o
+ lib-$(CONFIG_HEAD)      += head.o
+ lib-$(CONFIG_HOSTID)    += hostid.o
+ lib-$(CONFIG_ID)        += id.o
+Index: busybox/coreutils/Config.in
+===================================================================
+--- busybox/coreutils/Config.in	(revision 23238)
++++ busybox/coreutils/Config.in	(working copy)
+@@ -249,6 +249,12 @@
+ 	help
+ 	  Wrap text to fit a specific width.
+ 
++config FSYNC
++	bool "fsync"
++	default n
++	help
++	  fsync is used to flush file-related cached blocks to disk.
++
+ config HEAD
+ 	bool "head"
+ 	default n
+Index: busybox/include/usage.h
+===================================================================
+--- busybox/include/usage.h	(revision 23238)
++++ busybox/include/usage.h	(working copy)
+@@ -3905,6 +3905,13 @@
+ #define sync_full_usage "\n\n" \
+        "Write all buffered filesystem blocks to disk"
+ 
++#define fsync_trivial_usage \
++       "[OPTION]... FILE..."
++#define fsync_full_usage \
++       "Write files' buffered blocks to disk\n" \
++     "\nOptions:" \
++     "\n        -d     Avoid syncing metadata (like access time)"
++
+ #define sysctl_trivial_usage \
+        "[OPTIONS]... [VALUE]..."
+ #define sysctl_full_usage "\n\n" \
+Index: busybox/include/applets.h
+===================================================================
+--- busybox/include/applets.h	(revision 23238)
++++ busybox/include/applets.h	(working copy)
+@@ -160,6 +160,7 @@
+ //USE_E2FSCK(APPLET_ODDNAME(fsck.ext2, e2fsck, _BB_DIR_SBIN, _BB_SUID_NEVER, fsck_ext2))
+ //USE_E2FSCK(APPLET_ODDNAME(fsck.ext3, e2fsck, _BB_DIR_SBIN, _BB_SUID_NEVER, fsck_ext3))
+ USE_FSCK_MINIX(APPLET_ODDNAME(fsck.minix, fsck_minix, _BB_DIR_SBIN, _BB_SUID_NEVER, fsck_minix))
++USE_FSYNC(APPLET_NOFORK(fsync, fsync, _BB_DIR_BIN, _BB_SUID_NEVER, fsync))
+ USE_FTPGET(APPLET_ODDNAME(ftpget, ftpgetput, _BB_DIR_USR_BIN, _BB_SUID_NEVER, ftpget))
+ USE_FTPPUT(APPLET_ODDNAME(ftpput, ftpgetput, _BB_DIR_USR_BIN, _BB_SUID_NEVER, ftpput))
+ USE_FUSER(APPLET(fuser, _BB_DIR_USR_BIN, _BB_SUID_NEVER))
