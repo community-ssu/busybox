@@ -1,0 +1,30 @@
+--- busybox.orig/util-linux/mount.c
++++ busybox/util-linux/mount.c
+@@ -26,6 +26,9 @@
+ /* For FEATURE_MOUNT_LABEL only */
+ #include "volume_id.h"
+ #endif
++#ifndef MS_RELATIME
++#define MS_RELATIME	(1 << 21)
++#endif
+ 
+ /* Needed for nfs support only */
+ #include <sys/utsname.h>
+@@ -136,6 +139,8 @@
+ 		/* "noatime"     */ MS_NOATIME,
+ 		/* "diratime"    */ ~MS_NODIRATIME,
+ 		/* "nodiratime"  */ MS_NODIRATIME,
++		/* "relatime"    */ MS_RELATIME,
++		/* "norelatime"  */ ~MS_RELATIME,
+ 		/* "loud"        */ ~MS_SILENT,
+ 
+ 		// action flags
+@@ -186,6 +191,8 @@
+ 		"noatime" "\0"
+ 		"diratime" "\0"
+ 		"nodiratime" "\0"
++		"relatime" "\0"
++		"norelatime" "\0"
+ 		"loud" "\0"
+ 
+ 		// action flags
