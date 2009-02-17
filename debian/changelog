@@ -1,3 +1,10 @@
+busybox (3:1.10.2.legal-1osso16) unstable; urgency=low
+
+  * Added CONFIG_CLEAR and CONFIG_RESET to config.maemo
+  * Added ncurses-bin to Provides/Replaces/Conflicts. Fixes: NB#92440
+
+ -- Turo Janka <ext-turo.1.janka@nokia.com>  Thu, 12 Feb 2009 12:50:42 +0200
+
 busybox (3:1.10.2.legal-1osso15) unstable; urgency=low
 
   * Removed CONFIG_FEATURE_GUNZIP_UNCOMPRESS from config.maemo

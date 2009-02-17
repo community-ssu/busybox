@@ -10,9 +10,9 @@ Standards-Version: 3.7.3
 Package: busybox
 Architecture: any
 Depends: ${shlibs:Depends}
-Conflicts: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, nawk, mawk, gawk, elvis-tiny, mktemp, bsdutils, sysvinit-utils, iputils-ping, psmisc, time
-Replaces: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, mktemp, bsdutils, sysvinit-utils, dnsutils, iputils-ping, psmisc, time
-Provides: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, vi, awk, nawk, mawk, gawk, mktemp, bsdutils, sysvinit-utils, iputils-ping, psmisc, time
+Conflicts: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, nawk, mawk, gawk, elvis-tiny, mktemp, bsdutils, sysvinit-utils, iputils-ping, psmisc, time, ncurses-bin
+Replaces: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, mktemp, bsdutils, sysvinit-utils, dnsutils, iputils-ping, psmisc, time, ncurses-bin
+Provides: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, vi, awk, nawk, mawk, gawk, mktemp, bsdutils, sysvinit-utils, iputils-ping, psmisc, time, ncurses-bin
 Description: Tiny utilities for small and embedded systems
  BusyBox combines tiny versions of many common UNIX utilities into a single
  small executable. It provides minimalist replacements for the most common
