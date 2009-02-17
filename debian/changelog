@@ -1,3 +1,10 @@
+busybox (3:1.10.2.legal-1osso15) unstable; urgency=low
+
+  * Removed CONFIG_FEATURE_GUNZIP_UNCOMPRESS from config.maemo
+  * Added CONFIG_UNCOMPRESS to config.maemo. Fixes: NB#98035
+
+ -- Turo Janka <ext-turo.1.janka@nokia.com>  Wed, 11 Feb 2009 16:08:12 +0200
+
 busybox (3:1.10.2.legal-1osso14) unstable; urgency=low
   
   * Fixes time command segfault. Fixes: NB#98230
