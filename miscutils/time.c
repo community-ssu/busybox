@@ -402,6 +402,7 @@ int time_main(int argc ATTRIBUTE_UNUSED, char **argv)
 	const char *output_format = default_format;
 	int opt;
 
+        opt_complementary = "-1"; /* at least one arg */
 	/* "+": stop on first non-option */
 	opt = getopt32(argv, "+vp");
 	argv += optind;

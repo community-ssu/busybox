@@ -1,3 +1,9 @@
+busybox (3:1.10.2.legal-1osso14) unstable; urgency=low
+  
+  * Fixes time command segfault. Fixes: NB#98230
+ 
+ -- Turo Janka <ext-turo.1.janka@nokia.com>  Tue, 21 Jan 2009 15:48:12 +0200
+
 busybox (3:1.10.2.legal-1osso13) unstable; urgency=low
 
   * Enable more tools. Fixes: NB#98035
