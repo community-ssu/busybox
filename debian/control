@@ -2,17 +2,17 @@ Source: busybox
 Priority: optional
 Section: utils
 Maintainer: Yauheni Kaliuta <yauheni.kaliuta@nokia.com>
-Original-Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
-Original-Uploaders: Bastian Blank <waldi@debian.org>
-Build-Depends: debhelper (>> 5), lsb-release, quilt
+XS-Original-Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+XS-Original-Uploaders: Bastian Blank <waldi@debian.org>
+Build-Depends: debhelper (>> 5), lsb-release, python, quilt
 Standards-Version: 3.7.3
 
 Package: busybox
 Architecture: any
-Depends: ${shlibs:Depends}
-Conflicts: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, nawk, mawk, gawk, elvis-tiny, mktemp, bsdutils, sysvinit-utils, iputils-ping, psmisc, time, ncurses-bin
-Replaces: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, mktemp, bsdutils, sysvinit-utils, dnsutils, iputils-ping, psmisc, time, ncurses-bin
-Provides: busybox-static, findutils, gzip, hostname, ifupdown, net-tools, procps, sed, tar, coreutils, grep, mount, login, debianutils, util-linux, vi, awk, nawk, mawk, gawk, mktemp, bsdutils, sysvinit-utils, iputils-ping, psmisc, time, ncurses-bin
+Depends: ${shlibs:Depends}, busybox-symlinks-busybox (= ${binary:Version})
+Provides: ash, awk, bsdutils, coreutils, debianutils, diff, editor, findutils, grep, gzip, hostname, login, mktemp, mount, ncurses-bin, sed, sysvinit-utils, tar, util-linux
+Replaces: ash, bsdutils, coreutils, debianutils, diff, findutils, grep, gzip, hostname, login, mktemp, mount, ncurses-bin, sed, sysvinit-utils, tar, util-linux
+Conflicts: ash, bsdutils, coreutils, debianutils, diff, findutils, grep, gzip, hostname, login, mktemp, mount, ncurses-bin, sed, sysvinit-utils, tar, util-linux
 Description: Tiny utilities for small and embedded systems
  BusyBox combines tiny versions of many common UNIX utilities into a single
  small executable. It provides minimalist replacements for the most common
@@ -22,22 +22,100 @@ Description: Tiny utilities for small and embedded systems
  provide the expected functionality and behave very much like their GNU
  counterparts.
  .
- This package installs the BusyBox binary but does not install symlinks
- for any of the supported utilities. You can use /bin/busybox --install
- to install BusyBox to the current directory (you do not want to do this
- in / on your Debian system!).
+ This package installs:
+ - the BusyBox binary
+ - symlinks for tools included into it that correspond to binaries
+   in essential Debian packages
+ - alternatives from packages that don't have anything else
+ .
+ Symlinks to other tools included into BusyBox which correspond to binaries
+ in non-essential Debian packages are provided in separate symlink packages.
+ Those package are split and named according to the corresponding Debian
+ packages.
 
 Package: busybox-dbg
 Architecture: any
-Depends: busybox (= ${Source-Version})
+Depends: busybox (= ${binary:Version})
 Section: devel
-Description: Tiny utilities for small and embedded systems (debug version)
- BusyBox combines tiny versions of many common UNIX utilities into a single
- small executable. It provides minimalist replacements for the most common
- utilities you would usually find on your desktop system (i.e., ls, cp, mv,
- mount, tar, etc.). The utilities in BusyBox generally have fewer options than
- their full-featured GNU cousins; however, the options that are included
- provide the expected functionality and behave very much like their GNU
- counterparts.
- .
- This package installs the BusyBox binary with debug symbols
+Description: Debug symbols for BusyBox
+ Debug symbol file for BusyBox. BusyBox provides tiny utilities for small
+ and embedded systems.
+
+Package: busybox-symlinks-busybox
+Architecture: all
+Description: BusyBox specific symlinks
+ BusyBox symlinks for utilities without counterparts in Debian.
+ These are in separate package because they aren't essentials
+ (e.g. needed for system package upgrades).
+
+Package: busybox-symlinks-console-tools
+Architecture: all
+Provides: console-tools
+Replaces: console-tools
+Conflicts: console-tools
+Description: BusyBox symlinks to provide 'console-tools'
+ BusyBox symlinks for utilities corresponding to 'console-tools' package.
+
+Package: busybox-symlinks-dnsutils
+Architecture: all
+Provides: dnsutils
+Replaces: dnsutils
+Conflicts: dnsutils
+Description: BusyBox symlinks to provide 'dnsutils'
+ BusyBox symlinks for utilities corresponding to 'dnsutils' package.
+
+Package: busybox-symlinks-ifupdown
+Architecture: all
+Provides: ifupdown
+Replaces: ifupdown
+Conflicts: ifupdown
+Description: BusyBox symlinks to provide 'ifupdown'
+ BusyBox symlinks for utilities corresponding to 'ifupdown' package.
+
+Package: busybox-symlinks-iputils-ping
+Architecture: all
+Provides: iputils-ping
+Replaces: iputils-ping
+Conflicts: iputils-ping
+Description: BusyBox symlinks to provide 'iputils-ping'
+ BusyBox symlinks for utilities corresponding to 'iputils-ping' package.
+
+Package: busybox-symlinks-net-tools
+Architecture: all
+Provides: net-tools
+Replaces: net-tools
+Conflicts: net-tools
+Description: BusyBox symlinks to provide 'net-tools'
+ BusyBox symlinks for utilities corresponding to 'net-tools' package.
+
+Package: busybox-symlinks-procps
+Architecture: all
+Provides: procps
+Replaces: procps
+Conflicts: procps
+Description: BusyBox symlinks to provide 'procps'
+ BusyBox symlinks for utilities corresponding to 'procps' package.
+
+Package: busybox-symlinks-psmisc
+Architecture: all
+Provides: psmisc
+Replaces: psmisc
+Conflicts: psmisc
+Description: BusyBox symlinks to provide 'psmisc'
+ BusyBox symlinks for utilities corresponding to 'psmisc' package.
+
+Package: busybox-symlinks-realpath
+Architecture: all
+Provides: realpath
+Replaces: realpath
+Conflicts: realpath
+Description: BusyBox symlinks to provide 'realpath'
+ BusyBox symlinks for utilities corresponding to 'realpath' package.
+
+Package: busybox-symlinks-time
+Architecture: all
+Provides: time
+Replaces: time
+Conflicts: time
+Description: BusyBox symlinks to provide 'time'
+ BusyBox symlinks for utilities corresponding to 'time' package.

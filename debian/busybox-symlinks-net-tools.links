@@ -1,0 +1,5 @@
+bin/busybox sbin/ifconfig
+bin/busybox sbin/nameif
+bin/busybox bin/netstat
+bin/busybox sbin/route
+bin/busybox sbin/slattach

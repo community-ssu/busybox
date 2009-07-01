@@ -1,0 +1,83 @@
+From bd1286e986f451da0286d3ff28f0e99763f8de13 Mon Sep 17 00:00:00 2001
+From: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+Date: Fri, 27 Mar 2009 12:02:02 +0200
+Subject: [PATCH] change top to display RSS instead of VSZ. Fixes: NB#103591.
+
+Signed-off-by: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+---
+ procps/top.c |   22 +++++++++++-----------
+ 1 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/procps/top.c b/procps/top.c
+index 206f9e8..8880a19 100644
+--- a/procps/top.c
++++ b/procps/top.c
+@@ -32,7 +32,7 @@
+ 
+ 
+ typedef struct top_status_t {
+-	unsigned long vsz;
++	unsigned long rss;
+ #if ENABLE_FEATURE_TOP_CPU_USAGE_PERCENTAGE
+ 	unsigned long ticks;
+ 	unsigned pcpu; /* delta of ticks */
+@@ -129,8 +129,8 @@ static int pid_sort(top_status_t *P, top_status_t *Q)
+ static int mem_sort(top_status_t *P, top_status_t *Q)
+ {
+ 	/* We want to avoid unsigned->signed and truncation errors */
+-	if (Q->vsz < P->vsz) return -1;
+-	return Q->vsz != P->vsz; /* 0 if ==, 1 if > */
++	if (Q->rss < P->rss) return -1;
++	return Q->rss != P->rss; /* 0 if ==, 1 if > */
+ }
+ 
+ 
+@@ -394,12 +394,12 @@ static NOINLINE void display_process_list(int count, int scr_width)
+ 
+ 	/* what info of the processes is shown */
+ 	printf(OPT_BATCH_MODE ? "%.*s" : "\e[7m%.*s\e[0m", scr_width,
+-		"  PID  PPID USER     STAT   VSZ %MEM %CPU COMMAND");
++		"  PID  PPID USER     STAT   RSS %MEM %CPU COMMAND");
+ #else
+ 
+ 	/* !CPU_USAGE_PERCENTAGE */
+ 	printf(OPT_BATCH_MODE ? "%.*s" : "\e[7m%.*s\e[0m", scr_width,
+-		"  PID  PPID USER     STAT   VSZ %MEM COMMAND");
++		"  PID  PPID USER     STAT   RSS %MEM COMMAND");
+ #endif
+ 
+ #if ENABLE_FEATURE_TOP_DECIMALS
+@@ -458,16 +458,16 @@ static NOINLINE void display_process_list(int count, int scr_width)
+ 	/* Ok, all preliminary data is ready, go through the list */
+ 	while (count-- > 0) {
+ 		unsigned col;
+-		CALC_STAT(pmem, (s->vsz*pmem_scale + pmem_half) >> pmem_shift);
++		CALC_STAT(pmem, (s->rss*pmem_scale + pmem_half) >> pmem_shift);
+ #if ENABLE_FEATURE_TOP_CPU_USAGE_PERCENTAGE
+ 		CALC_STAT(pcpu, (s->pcpu*pcpu_scale + pcpu_half) >> pcpu_shift);
+ #endif
+ 
+-		if (s->vsz >= 100000)
+-			sprintf(vsz_str_buf, "%6ldm", s->vsz/1024);
++		if (s->rss >= 100000)
++			sprintf(vsz_str_buf, "%6ldm", s->rss/1024);
+ 		else
+-			sprintf(vsz_str_buf, "%7ld", s->vsz);
+-		// PID PPID USER STAT VSZ %MEM [%CPU] COMMAND
++			sprintf(vsz_str_buf, "%7ld", s->rss);
++		// PID PPID USER STAT RSS %MEM [%CPU] COMMAND
+ 		col = snprintf(line_buf, scr_width,
+ 				"\n" "%5u%6u %-8.8s %s%s" FMT
+ #if ENABLE_FEATURE_TOP_CPU_USAGE_PERCENTAGE
+@@ -817,7 +817,7 @@ int top_main(int argc ATTRIBUTE_UNUSED, char **argv)
+ 				top = xrealloc(top, (++ntop) * sizeof(*top));
+ 				top[n].pid = p->pid;
+ 				top[n].ppid = p->ppid;
+-				top[n].vsz = p->vsz;
++				top[n].rss = p->rss;
+ #if ENABLE_FEATURE_TOP_CPU_USAGE_PERCENTAGE
+ 				top[n].ticks = p->stime + p->utime;
+ #endif
+-- 
+1.6.1.3
+

@@ -1,0 +1,6 @@
+bin/busybox usr/bin/chvt
+bin/busybox usr/bin/deallocvt
+bin/busybox usr/bin/openvt
+bin/busybox usr/bin/setkeycodes
+bin/busybox usr/bin/setlogcons
+bin/busybox usr/bin/kbd_mode

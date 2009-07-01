@@ -1,0 +1,91 @@
+
+Changes between Diablo and Fremantle Maemo BusyBox configurations
+-----------------------------------------------------------------
+
+- sysvinit: in Diablo, real package, in Fremantle, provided by BB
+  - In Fremantle "/sbin/init" comes from "upstart", not sysvinit though
+  - Note: In Debian Lenny sysvinit was split to sysvinit & sysvinit-tools
+    and the debian-mapping.txt follows that.  Diablo sysvinit still
+    contains binaries for both of these packages like Debian Etch did
+- module-init-tools: in Diablo, provided by BB, in Fremantle, real package
+
+
+Comparison between Maemo BusyBox symlinks and Debian (Etch-Sid) binaries
+========================================================================
+
+Two ways for listing applets:
+- ./busybox|grep -A99 addgroup|tr ',' '\n'|awk '/[^ ]/{print $1}'|sort
+- make busybox.links
+  python -c "import os;\
+  print ''.join([os.path.basename(x) for x in open('busybox.links')])"
+
+
+Name conflicts
+--------------
+
+pscan: BusyBox binary scans ports, Debian C-source
+ftpput: BusyBox binary has regular FTP, Debian camera additions
+
+
+Renames/replacements
+--------------------
+
+It doesn't make sense to rename these to use same
+name as Debian alternative before somebody checks
+that they're compatible enough with the Debian ones.
+
+Debian:   BusyBox:
+lzcat     -> lzmacat
+makedev   -> makedevs
+udev      -> mdev
+microcom  -> minicom
+splash    -> fbsplash
+cron      -> crond
+dhttpd    -> httpd
+in.tftpd  -> tftpd
+cat -v    -> catv
+ip addr   -> ipaddr
+ip link   -> iplink
+ip route  -> iproute
+ip tunnel -> iptunnel
+ip rule   -> iprule
+
+For some reason, in Debian 'dnsd' is in (dietlibc)-dev package
+and located in /usr/lib/diet/bin/dnsd.
+
+
+Extras
+------
+
+[[ -> symlink to [
+
+
+Special cases
+-------------
+
+'linuxrc' file in upstream source, not included into our package.
+
+Following ones are in our BusyBox package, but not in upstream or
+Debian.
+
+util-linux:
+/sbin/sfdisk (binary)
+
+debianutils:
+/bin/tempfile (script)
+
+module-init-tools:
+/sbin/update-modules (empty script)
+
+(no corresponding Debian package):
+/bin/fsync (BusyBox applet)
+
+
+Related files
+-------------
+
+ifupdown (dirs):
+/etc/network/if-down.d/
+/etc/network/if-post-down.d/
+/etc/network/if-pre-up.d/
+/etc/network/if-up.d/

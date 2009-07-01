@@ -1,0 +1,28 @@
+From 2089b4bf5880f49e8185b2e07966714a9ce9dcd5 Mon Sep 17 00:00:00 2001
+From: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+Date: Fri, 12 Jun 2009 14:43:26 +0300
+Subject: [PATCH] Don't follow symlinks for -l or -s in ls. Fixes: NB#120999.
+
+Signed-off-by: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+---
+ coreutils/ls.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/coreutils/ls.c b/coreutils/ls.c
+index 9e5c6de..e06f0eb 100644
+--- a/coreutils/ls.c
++++ b/coreutils/ls.c
+@@ -908,8 +908,8 @@ int ls_main(int argc, char **argv)
+ 	/* stuff the command line file names into a dnode array */
+ 	dn = NULL;
+ 	for (oi = 0; oi < ac; oi++) {
+-		/* ls w/o -l follows links on command line */
+-		cur = my_stat(av[oi], av[oi], !(all_fmt & STYLE_LONG));
++		/* NB: follow links on command line unless -l or -s */
++		cur = my_stat(av[oi], av[oi], !(all_fmt & (STYLE_LONG|LIST_BLOCKS)));
+ 		if (!cur)
+ 			continue;
+ 		cur->allocated = 0;
+-- 
+1.6.3.1
+

@@ -1,0 +1,88 @@
+From 02d849739e15552046128abb8dba79c584266f61 Mon Sep 17 00:00:00 2001
+From: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+Date: Fri, 6 Mar 2009 15:24:52 +0200
+Subject: [PATCH] pidof/killall5: fix DNA problems of hald children and the like
+
+Children of hal daemon make a perfect example of why reading
+/proc/$pid/exe symlink is about the only reliable way to figure
+if the process is what we're actually looking for: they clobber
+their argv[0] and argv[1].
+
+Signed-off-by: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+---
+ include/libbb.h          |    4 +++-
+ libbb/find_pid_by_name.c |    6 +++++-
+ libbb/procps.c           |    6 ++++++
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/include/libbb.h b/include/libbb.h
+index 859b3bc..4f75d96 100644
+--- a/include/libbb.h
++++ b/include/libbb.h
+@@ -1101,6 +1101,8 @@ typedef struct procps_status_t {
+ 	 * (if executable is symlink or script, it is NOT replaced
+ 	 * by link target or interpreter name) */
+ 	char comm[COMM_LEN];
++	/* where /proc/$PID/exe points to */
++	char *exe;
+ 	/* user/group? - use passwd/group parsing functions */
+ } procps_status_t;
+ enum {
+@@ -1112,7 +1114,7 @@ enum {
+ 	PSSCAN_COMM     = 1 << 5,
+ 	/* PSSCAN_CMD      = 1 << 6, - use read_cmdline instead */
+ 	PSSCAN_ARGV0    = 1 << 7,
+-	/* PSSCAN_EXE      = 1 << 8, - not implemented */
++	PSSCAN_EXE      = 1 << 8, /* almost implemented */
+ 	PSSCAN_STATE    = 1 << 9,
+ 	PSSCAN_VSZ      = 1 << 10,
+ 	PSSCAN_RSS      = 1 << 11,
+diff --git a/libbb/find_pid_by_name.c b/libbb/find_pid_by_name.c
+index 8dcdb13..832116d 100644
+--- a/libbb/find_pid_by_name.c
++++ b/libbb/find_pid_by_name.c
+@@ -55,7 +55,7 @@ pid_t* find_pid_by_name(const char* procName)
+ 	procps_status_t* p = NULL;
+ 
+ 	pidList = xmalloc(sizeof(*pidList));
+-	while ((p = procps_scan(p, PSSCAN_PID|PSSCAN_COMM|PSSCAN_ARGV0))) {
++	while ((p = procps_scan(p, PSSCAN_PID|PSSCAN_COMM|PSSCAN_ARGV0|PSSCAN_EXE))) {
+ 		if (
+ 		/* we require comm to match and to not be truncated */
+ 		/* in Linux, if comm is 15 chars, it may be a truncated
+@@ -63,11 +63,15 @@ pid_t* find_pid_by_name(const char* procName)
+ 		    (!p->comm[sizeof(p->comm)-2] && strcmp(p->comm, procName) == 0)
+ 		/* or we require argv0 to match (essential for matching reexeced /proc/self/exe)*/
+ 		 || (p->argv0 && strcmp(bb_basename(p->argv0), procName) == 0)
++		 || (p->exe && strcmp(bb_basename(p->exe), procName) == 0)
+ 		/* TOOD: we can also try /proc/NUM/exe link, do we want that? */
+ 		) {
+ 			pidList = xrealloc(pidList, sizeof(*pidList) * (i+2));
+ 			pidList[i++] = p->pid;
+ 		}
++
++		if (p->exe)
++			free(p->exe);
+ 	}
+ 
+ 	pidList[i] = 0;
+diff --git a/libbb/procps.c b/libbb/procps.c
+index 8946917..f33c64e 100644
+--- a/libbb/procps.c
++++ b/libbb/procps.c
+@@ -378,6 +378,12 @@ procps_status_t *procps_scan(procps_status_t* sp, int flags)
+ 			}
+ 		}
+ #else
++		if (flags & (PSSCAN_EXE)) {
++			strcpy(filename_tail, "/exe");
++
++			sp->exe = xmalloc_readlink(filename);
++		}
++
+ 		if (flags & (PSSCAN_ARGV0|PSSCAN_ARGVN)) {
+ 			free(sp->argv0);
+ 			sp->argv0 = NULL;
+-- 
+1.6.1.3
+

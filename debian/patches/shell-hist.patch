@@ -1,0 +1,117 @@
+--- a/libbb/lineedit.c	2009-03-30 17:15:10.000000000 +0300
++++ b/libbb/lineedit.c	2009-03-31 17:52:48.000000000 +0300
+@@ -959,49 +959,48 @@
+ static void load_history(const char *fromfile)
+ {
+ 	FILE *fp;
+-	int hi;
++	int hi = 0;
+ 
+-	/* cleanup old */
+-	for (hi = state->cnt_history; hi > 0;) {
+-		hi--;
+-		free(state->history[hi]);
+-	}
+-
+-	fp = fopen(fromfile, "r");
+-	if (fp) {
+-		for (hi = 0; hi < MAX_HISTORY;) {
+-			char *hl = xmalloc_getline(fp);
+-			int l;
+-
+-			if (!hl)
+-				break;
+-			l = strlen(hl);
+-			if (l >= MAX_LINELEN)
+-				hl[MAX_LINELEN-1] = '\0';
+-			if (l == 0 || hl[0] == ' ') {
+-				free(hl);
+-				continue;
++	if (!state->cnt_history) {
++		fp = fopen(fromfile, "r");
++		if (fp) {
++			for (hi = 0; hi < MAX_HISTORY;) {
++				char *hl = xmalloc_getline(fp);
++				int l;
++
++				if (!hl)
++					break;
++				l = strlen(hl);
++				if (l >= MAX_LINELEN)
++					hl[MAX_LINELEN-1] = '\0';
++				if (l == 0 || hl[0] == ' ') {
++					free(hl);
++					continue;
++				}
++				state->history[hi++] = hl;
+ 			}
+-			state->history[hi++] = hl;
++			fclose(fp);
+ 		}
+-		fclose(fp);
++		state->cur_history = state->cnt_history = hi;
+ 	}
+-	state->cur_history = state->cnt_history = hi;
+ }
+ 
+ /* state->flags is already checked to be nonzero */
+-static void save_history(const char *tofile)
++void save_history(line_input_t *);
++void save_history(line_input_t *st)
+ {
+ 	FILE *fp;
+ 
+-	fp = fopen(tofile, "w");
+-	if (fp) {
+-		int i;
++	if (st->cnt_history) {
++		fp = fopen(st->hist_file, "w");
++		if (fp) {
++			int i;
+ 
+-		for (i = 0; i < state->cnt_history; i++) {
+-			fprintf(fp, "%s\n", state->history[i]);
++			for (i = 0; i < st->cnt_history; i++) {
++				fprintf(fp, "%s\n", st->history[i]);
++			}
++			fclose(fp);
+ 		}
+-		fclose(fp);
+ 	}
+ }
+ #else
+@@ -1030,10 +1029,6 @@
+ 	state->history[i++] = xstrdup(str);
+ 	state->cur_history = i;
+ 	state->cnt_history = i;
+-#if ENABLE_FEATURE_EDITING_SAVEHISTORY
+-	if ((state->flags & SAVE_HISTORY) && state->hist_file)
+-		save_history(state->hist_file);
+-#endif
+ 	USE_FEATURE_EDITING_FANCY_PROMPT(num_ok_lines++;)
+ }
+ 
+diff -r -u busybox-1.10.2.legal.orig/shell/ash.c busybox-1.10.2.legal/shell/ash.c
+--- busybox-1.10.2.legal.orig/shell/ash.c	2008-07-24 10:16:00.000000000 +0100
++++ busybox-1.10.2.legal/shell/ash.c	2009-03-23 17:09:11.000000000 +0000
+@@ -1733,6 +1733,9 @@
+ #if ENABLE_ASH_RANDOM_SUPPORT
+ static void change_random(const char *);
+ #endif
++#if ENABLE_FEATURE_EDITING_SAVEHISTORY
++void save_history(line_input_t *);
++#endif
+ 
+ static const struct {
+ 	int flags;
+@@ -12815,6 +12818,10 @@
+ 	char *p;
+ 	int status;
+ 
++	if (iflag && (line_input_state->flags & SAVE_HISTORY)
++	    && line_input_state->hist_file && !shlvl) {
++		save_history(line_input_state);
++	}
+ 	status = exitstatus;
+ 	TRACE(("pid %d, exitshell(%d)\n", getpid(), status));
+ 	if (setjmp(loc.loc)) {

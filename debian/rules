@@ -79,10 +79,15 @@ binary-arch_maemo: $(STAMPS_DIR)/build_maemo
 	dh_testdir
 	dh_testroot
 	dh_clean -k -d
+	# verify that packages links files are in sync with BB generated one
+	# some other time
+	#debian/scripts/check-links.py $(DIR)/busybox.links debian/*.links
+	# verify that Busybox provides these packages
+	grep util-linux debian/control > /dev/null
 	install -D -m755 debian/sfdisk/sfdisk debian/busybox/sbin/sfdisk
+	grep debianutils debian/control > /dev/null
 	install -D -m755 debian/local/tempfile debian/busybox/bin/tempfile
 	install -D -m755 $(DIR)/busybox_unstripped debian/busybox/bin/busybox
-	sed -e 's,^/,bin/busybox ,' $(DIR)/busybox.links | grep -v linuxrc >  debian/busybox.links
 
 	$(MAKE) -f debian/rules binary-arch_all
 
@@ -116,21 +121,21 @@ binary-arch_udeb: $(STAMPS_DIR)/build_udeb
 	dh_testroot
 	dh_clean -k -d
 	make -C $(DIR) install CONFIG_PREFIX=$(OUT_DIR)
-	# Remove init link, but init support is still compiled in to be
-	# used.
-	rm -f $(OUT_DIR)/sbin/init
 	$(MAKE) -f debian/rules binary-arch_all
 
 binary-arch_all:
 	dh_installdirs
-	dh_installdocs
-	dh_installchangelogs
-	dh_strip --dbg-package=busybox-dbg
+	# add docs & debug only for busybox package itself
+	dh_installdocs -pbusybox
+	dh_installchangelogs -pbusybox
+	dh_strip -pbusybox --dbg-package=busybox-dbg
+	dh_compress -pbusybox
+	# packaging
 	dh_link
-	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_shlibdeps
+	# only busybox package has binaries
+	dh_shlibdeps -pbusybox
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

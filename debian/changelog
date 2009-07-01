@@ -1,3 +1,79 @@
+busybox (3:1.10.2.legal-1osso26+0m5) unstable; urgency=low
+
+  * This entry has been added by BIFH queue processor
+    Suffix +0m5 added to package revision
+
+ -- Attiq Malik <ext-attiq.1.malik@nokia.com>  Wed, 01 Jul 2009 13:11:49 +0300
+
+busybox (3:1.10.2.legal-1osso26) unstable; urgency=low
+
+  * Enable more fance tar features. Fixes: NB#124832.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Mon, 29 Jun 2009 15:32:56 +0300
+
+busybox (3:1.10.2.legal-1osso25) unstable; urgency=low
+
+  * Call telinit to facilitate proper shutdown/reboot. Fixes: NB#120283.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Wed, 24 Jun 2009 14:41:13 +0300
+
+busybox (3:1.10.2.legal-1osso24) unstable; urgency=low
+
+  * Don't follow symlinks for -l or -s in ls. Fixes: NB#120999.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Mon, 15 Jun 2009 12:55:17 +0300
+
+busybox (3:1.10.2.legal-1osso23) unstable; urgency=low
+
+  * Enable more options for pidof. Fixes: NB#112823.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Thu, 23 Apr 2009 16:10:24 +0300
+
+busybox (3:1.10.2.legal-1osso22) unstable; urgency=low
+
+  * Remove 3 second sleep()s from sfdisk.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Thu, 23 Apr 2009 11:32:08 +0300
+
+busybox (3:1.10.2.legal-1osso21) unstable; urgency=low
+
+  * Drop dependencies to symlink packages. Fixes: NB#86011.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Wed, 01 Apr 2009 14:14:32 +0300
+
+busybox (3:1.10.2.legal-1osso20) unstable; urgency=low
+
+  * Merge sysvinit-maemo into busybox.
+  * Remove last from provided symlinks. Fixes: NB#108560.
+  * Patch to display RSS instead of VSZ in top. Fixes: NB#103591.
+  * Patch to only update history upon shell exit. Fixes: NB#107770.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Tue, 31 Mar 2009 14:28:47 +0300
+
+busybox (3:1.10.2.legal-1osso19) unstable; urgency=low
+
+  * Create alternatives directory if missing. Fixes: NB#107784.
+  * Enable CONFIG_FEATURE_TAR_OLDGNU_COMPATIBILITY. Fixes: NB#107771.
+  * Disable wtmp for applets. Fixes: NB#101256.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Wed, 25 Mar 2009 10:28:05 +0200
+
+busybox (3:1.10.2.legal-1osso18) unstable; urgency=low
+
+  * Transition: make busybox depend on all packages with symlinks
+  to facilitate NB#86011.
+  * Symlinks moved to separate packages to match debian's counterparts.
+  * Enable xargs support for quotes. Fixes: NB#96575.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Wed, 18 Mar 2009 12:39:35 +0200
+
+busybox (3:1.10.2.legal-1osso17) unstable; urgency=low
+
+  * Add IPv6 support. Fixes: NB#98038.
+  * Add fix for pidof/killall5. Fixes: NB#101755.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Tue, 10 Mar 2009 15:14:05 +0200
+
 busybox (3:1.10.2.legal-1osso16) unstable; urgency=low
 
   * Added CONFIG_CLEAR and CONFIG_RESET to config.maemo

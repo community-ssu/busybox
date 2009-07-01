@@ -9,4 +9,8 @@ init-console.patch
 06ls.dpatch
 fsync.patch
 busybox-zero-ifr.ifr_hwaddr.sa_data.patch
-
+pidof-fix.patch
+shell-hist.patch
+top-display-rss.patch
+ls-s-dont-follow-links.patch
+upstart-support.patch

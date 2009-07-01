@@ -1,0 +1,487 @@
+#
+# Mapping between Busybox binary name and in which package
+# that binary is in Debian.  The format is following:
+#   <package-name>: <path/to/tool> [<path/to/tool2> [<path/to/tool3>...]]
+# or:
+#   <package-name>: <path/to/tool> alternative [priority [altname(s)]]
+#
+# For example:
+# - normal case:
+#	coreutils: bin/cp
+# - multiple symlinks for given tool:
+#	iproute: bin/ip sbin/ip
+#	debianutils: bin/which usr/bin/which
+# - tool is a Debian alternative (by default has priority of 1):
+#	awk: usr/bin/awk alternative
+# - tool has regular symlink and alternative(s):
+#	util-linux: usr/bin/more alternative 10 usr/bin/pager
+#	less: usr/bin/less alternative 20 usr/bin/pager
+#
+# Lines starting with '#' are comments, empty lines are ignored
+#
+# Updating this file:
+# - If create-control.py complains that this is out of date,
+#   check with the http://packages.debian.org/ file search form
+#   in which package and with which path the given binary is
+#   in Debian.
+# - Install that package and check e.g. from the binary manual
+#   page and BusyBox commands references that the BB utility
+#   is "compatible enough" before listing it here. If it's not
+#   compatible, the BB utility should be renamed:
+#	http://busybox.net/downloads/BusyBox.html
+# 
+# Notes:
+# - In Debian "bash" provides /bin/sh.  In Ubuntu "dash" diverts
+#   bin/sh for itself.  For BusyBox I've set "ash" to provide /bin/sh.
+#   create-control.py sets "ash" to be Essential (unlike on Debian)
+#   to include its symlinks to busybox package, it also does the
+#   the required divert.
+# - The smaller BusyBox shells: lash, hush, msh, aren't really
+#   Bourne shell compatible, please use ash (it's stripped down
+#   version of Debian dash which is improved version of BSD Ash).
+#   http://lists.debian.org/debian-boot/2001/07/msg00104.html
+# - All paths are relative as that's what the Debian dh_link eats
+#
+# Hints:
+# - To get the list of package names listed here, use:
+#   awk '/#/{next}/:/{print $1}' debian-mappings.txt|tr -d :|sort -u
+# - To get list of alternatives:
+#   grep alternative debian-mappings.txt|grep -v '^#'
+# - If a package listed below contains only Debian alternatives,
+#   corresponding virtual package name is used as the package name here:
+#   http://www.debian.org/doc/packaging-manuals/virtual-package-names-list.txt
+#   See "awk", "man-browser" and "editor"
+#
+# TODO:
+# - Get Busybox to rename tools that conflict with unrelated
+#   Debian tools (see things commented as "Conflicts")
+# - How to specify that inet services (like ftp, telnet)
+#   should be registered for inetd (in postinst)?
+# - How to specify that services (like crond, inetd) should
+#   be registered for Upstart (in postinst)?
+# 
+# Changelog:
+# - 2008-12-09: link targets are relative (removed first '/').
+#   comment updates
+# - 2008-12-04: support alternatives and multiple symlinks
+#   and many other updates
+# - 2008-07-11: updated against Etch & packages.debian.org
+#   and Busybox 1.11.0
+
+
+# These busybox symlinks don't have a matching binary in Debian
+# and are therefore the same as in busybox.links.
+# 
+# Some may provides same functionality as something else in Debian,
+# but the compatibility should be checked before renaming.
+#
+# For rest of the Debian package mappings the binary path is same
+# as in Debian instead of what's in busybox.links file generated
+# by the Busybox build.
+
+# same as "["
+busybox: usr/bin/[[
+# Same as "cat -v"
+busybox: usr/bin/catv
+# does this correspond to Debian cron?
+busybox: usr/sbin/crond
+busybox: usr/bin/cryptpw
+busybox: usr/sbin/dhcprelay
+busybox: usr/sbin/dnsd
+busybox: bin/dumpkmap
+busybox: usr/bin/ether-wake
+busybox: usr/sbin/fakeidentd
+# does this correspond to Debian splash?
+busybox: sbin/fbsplash
+# maemo addition
+busybox: bin/fsync
+busybox: usr/bin/ftpget
+# Conflicts: camstream
+# (Busybox binary has regular FTP, Debian one camera additions)
+busybox: usr/bin/ftpput
+# Provides: httpd?
+busybox: usr/sbin/httpd
+busybox: sbin/ifenslave
+busybox: sbin/inotifyd
+# same as "ip addr"
+busybox: bin/ipaddr
+# same as " ip link"
+busybox: bin/iplink
+# same as "ip route"
+busybox: bin/iproute
+# same as "ip rule"
+busybox: bin/iprule
+busybox: usr/bin/length
+busybox: linuxrc
+busybox: usr/bin/loadfont
+busybox: sbin/loadkmap
+busybox: sbin/logread
+# does this correspond to Debian lzcat?
+busybox: usr/bin/lzmacat
+# does this correspond to Debian makedev?
+busybox: sbin/makedevs
+# does this correspond to Debian udev?
+busybox: sbin/mdev
+# does this correspond to Debian minicom?
+busybox: usr/bin/microcom
+busybox: usr/bin/nmeter
+busybox: bin/pipe_progress
+# Conflicts: pscan (Busybox binary scans ports, Debian one C-source)?
+busybox: usr/bin/pscan
+busybox: sbin/raidautorun
+busybox: usr/bin/readahead
+busybox: usr/bin/rtcwake
+busybox: sbin/setconsole
+busybox: sbin/switch_root
+# Provides: ftp-server?
+busybox: usr/sbin/tftpd
+busybox: usr/bin/ttysize
+busybox: bin/usleep
+
+adduser: usr/sbin/addgroup
+adduser: usr/sbin/adduser
+adduser: usr/sbin/delgroup
+adduser: usr/sbin/deluser
+
+adjtimex: usr/bin/adjtimex
+
+# /bin/sh is special case, see Notes
+ash: bin/ash
+ash: bin/sh
+#bash: bin/sh
+
+# awk is a virtual package name, this is OK for alternatives
+awk: usr/bin/awk alternative
+
+binutils: usr/bin/ar
+binutils: usr/bin/strings
+
+bridge-utils: usr/bin/brctl
+
+bsdmainutils: usr/bin/cal
+bsdmainutils: usr/bin/hexdump
+
+bsdutils: usr/bin/logger
+bsdutils: usr/bin/renice
+bsdutils: usr/bin/script
+
+bzip2: bin/bunzip2
+bzip2: bin/bzcat
+bzip2: bin/bzip2
+
+console-tools: usr/bin/chvt
+console-tools: usr/bin/deallocvt
+console-tools: usr/bin/kbd_mode
+console-tools: usr/bin/openvt
+console-tools: usr/bin/setkeycodes
+console-tools: usr/bin/setlogcons
+
+coreutils: bin/cat
+coreutils: bin/chgrp
+coreutils: bin/chmod
+coreutils: bin/chown
+coreutils: bin/cp
+coreutils: bin/date
+coreutils: bin/dd
+coreutils: bin/df
+coreutils: bin/echo
+coreutils: bin/false
+coreutils: bin/ln
+coreutils: bin/ls
+coreutils: bin/mkdir
+coreutils: bin/mknod
+coreutils: bin/mv
+coreutils: bin/pwd
+coreutils: bin/readlink
+coreutils: bin/rm
+coreutils: bin/rmdir
+coreutils: bin/sleep
+coreutils: bin/stty
+coreutils: bin/sync
+coreutils: bin/touch
+coreutils: bin/true
+coreutils: bin/uname
+coreutils: usr/bin/[
+coreutils: usr/bin/basename
+coreutils: usr/bin/chcon
+coreutils: usr/bin/cksum
+coreutils: usr/bin/comm
+coreutils: usr/bin/cut
+coreutils: usr/bin/dirname
+coreutils: usr/bin/du
+coreutils: usr/bin/env
+coreutils: usr/bin/expand
+coreutils: usr/bin/expr
+coreutils: usr/bin/fold
+coreutils: usr/bin/head
+coreutils: usr/bin/hostid
+coreutils: usr/bin/id
+coreutils: usr/bin/install
+coreutils: usr/bin/logname
+coreutils: usr/bin/md5sum
+coreutils: usr/bin/mkfifo
+coreutils: usr/bin/nice
+coreutils: usr/bin/nohup
+coreutils: usr/bin/od
+coreutils: usr/bin/printenv
+coreutils: usr/bin/printf
+coreutils: usr/bin/runcon
+coreutils: usr/bin/seq
+coreutils: usr/bin/sha1sum
+coreutils: usr/bin/sort
+coreutils: usr/bin/split
+coreutils: usr/bin/stat
+coreutils: usr/bin/sum
+coreutils: usr/bin/tac
+coreutils: usr/bin/tail
+coreutils: usr/bin/tee
+coreutils: usr/bin/test
+coreutils: usr/bin/tr
+coreutils: usr/bin/tty
+coreutils: usr/bin/unexpand
+coreutils: usr/bin/uniq
+coreutils: usr/bin/wc
+coreutils: usr/bin/who
+coreutils: usr/bin/whoami
+coreutils: usr/bin/yes
+coreutils: usr/sbin/chroot
+
+cpio: bin/cpio
+cpio: bin/mt alternative
+
+cron: usr/bin/crontab
+
+# sid/later
+daemontools: usr/bin/envdir
+daemontools: usr/bin/envuidgid
+daemontools: usr/bin/setuidgid
+daemontools: usr/bin/softlimit
+
+dc: usr/bin/dc
+
+debianutils: bin/run-parts
+debianutils: bin/which usr/bin/which
+
+diff: usr/bin/cmp
+diff: usr/bin/diff
+
+dnsutils: usr/bin/nslookup
+
+dpkg: sbin/start-stop-daemon
+
+e2fsprogs: sbin/findfs
+e2fsprogs: sbin/fsck
+e2fsprogs: usr/bin/chattr
+e2fsprogs: usr/bin/lsattr
+
+ed: bin/ed
+
+eject: usr/bin/eject
+
+ssmtp: usr/sbin/sendmail
+
+fbset: bin/fbset
+
+fdflush: bin/fdflush
+
+fetchmail: usr/bin/fetchmail
+
+findutils: usr/bin/find
+findutils: usr/bin/xargs
+
+grep: bin/egrep
+grep: bin/fgrep
+grep: bin/grep
+
+gzip: bin/gunzip
+gzip: bin/gzip
+gzip: bin/uncompress
+gzip: bin/zcat
+
+hdparm: sbin/hdparm
+
+hostname: bin/hostname
+
+ifupdown: sbin/ifdown
+ifupdown: sbin/ifup
+
+initscripts: bin/mountpoint
+
+ipcalc: usr/bin/ipcalc
+
+iproute: bin/ip sbin/ip
+
+ipsvd: usr/bin/tcpsvd
+ipsvd: usr/bin/udpsvd
+
+iputils-arping: usr/bin/arping
+
+iputils-ping: bin/ping
+iputils-ping: bin/ping6
+
+klogd: sbin/klogd
+
+less: usr/bin/less alternative 20 usr/bin/pager
+
+loadlin: usr/bin/freeramdisk
+
+login: bin/login
+login: bin/su
+
+lpr: usr/bin/lpd
+lpr: usr/bin/lpq
+lpr: usr/bin/lpr
+
+lrzsz: usr/bin/rx
+
+lzma: usr/bin/unlzma
+
+# man-browser is a virtual package name, this is OK for alternatives
+man-browser: usr/bin/man alternative
+
+mktemp: bin/mktemp
+
+module-init-tools: sbin/depmod
+module-init-tools: sbin/insmod
+module-init-tools: sbin/lsmod
+module-init-tools: sbin/modprobe
+module-init-tools: sbin/rmmod
+
+mount: bin/mount
+mount: bin/umount
+mount: sbin/losetup
+mount: sbin/swapoff
+mount: sbin/swapon
+
+ncurses-bin: usr/bin/clear
+ncurses-bin: usr/bin/reset
+
+# starting from lenny, netcat is a virtual package (for upgrade reasons)
+netcat: bin/nc alternative
+
+net-tools: bin/netstat
+net-tools: sbin/ifconfig
+net-tools: sbin/iptunnel
+net-tools: sbin/nameif
+net-tools: sbin/route
+net-tools: sbin/slattach
+net-tools: usr/sbin/arp
+
+openbsd-inetd: usr/sbin/inetd
+
+passwd: usr/bin/passwd
+passwd: usr/sbin/chpasswd
+
+patch: usr/bin/patch
+
+ppp: usr/sbin/chat
+
+procps: bin/kill
+procps: bin/ps
+procps: sbin/sysctl
+procps: usr/bin/free
+procps: usr/bin/pgrep
+procps: usr/bin/pkill
+procps: usr/bin/top
+procps: usr/bin/uptime
+procps: usr/bin/watch
+
+psmisc: bin/fuser
+psmisc: usr/bin/killall
+
+rdate: usr/sbin/rdate
+
+realpath: usr/bin/realpath
+
+rpm: usr/bin/rpm
+rpm: usr/bin/rpm2cpio
+
+runit: usr/bin/chpst
+runit: usr/bin/runsv
+runit: usr/bin/runsvdir
+runit: usr/bin/sv
+runit: usr/bin/svlogd
+
+sed: bin/sed
+
+sharutils: usr/bin/uudecode
+sharutils: usr/bin/uuencode
+
+sysklogd: sbin/syslogd
+
+# sysvinit-maemo is a workaround against upstart, which conflicts with
+# sysvinit, but doesn't provide these binaries
+sysvinit-maemo: sbin/halt
+sysvinit: sbin/init
+sysvinit-maemo: sbin/poweroff
+sysvinit-maemo: sbin/reboot
+sysvinit-maemo: sbin/runlevel
+
+sysvinit-utils: bin/pidof
+sysvinit-utils: sbin/killall5
+sysvinit-utils: sbin/sulogin
+sysvinit-utils: usr/bin/last
+sysvinit-utils: usr/bin/mesg
+
+tar: bin/tar
+
+telnetd: usr/sbin/telnetd
+
+# telnet-client is a virtual package name, this is OK for alternatives
+telnet-client: usr/bin/telnet alternative
+
+tftp: usr/bin/tftp
+
+time: usr/bin/time
+
+tofrodos: usr/bin/dos2unix
+tofrodos: usr/bin/unix2dos
+
+traceroute: usr/bin/traceroute alternative
+
+udhcpc: usr/bin/udhcpc
+
+udhcpd: usr/bin/dumpleases
+udhcpd: usr/sbin/udhcpd
+
+unzip: usr/bin/unzip
+
+util-linux: bin/dmesg
+util-linux: bin/more alternative 10 usr/bin/pager
+util-linux: sbin/fdisk
+util-linux: sbin/fsck.minix
+util-linux: sbin/getty
+util-linux: sbin/hwclock
+util-linux: sbin/mkfs.minix
+util-linux: sbin/mkswap
+util-linux: sbin/pivot_root
+# before lenny this binary was in schedutils package
+util-linux: usr/bin/chrt
+util-linux: usr/bin/fdformat
+util-linux: usr/bin/getopt
+util-linux: usr/bin/ipcrm
+util-linux: usr/bin/ipcs
+# before lenny these two were in linux32 package
+util-linux: usr/bin/linux32
+util-linux: usr/bin/linux64
+# this didn't exist before lenny
+util-linux: usr/bin/setarch
+util-linux: usr/bin/setsid
+# before lenny this binary was in schedutils package
+util-linux: usr/bin/taskset
+util-linux: usr/sbin/readprofile
+
+# editor is (an obsolete) virtual package name, this is OK for alternatives
+editor: usr/bin/vi alternative
+
+vlan: sbin/vconfig
+
+vlock: usr/bin/vlock
+
+watchdog: usr/sbin/watchdog
+
+wget: usr/bin/wget
+
+xterm: usr/bin/resize
+
+zcip: usr/bin/zcip

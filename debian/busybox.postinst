@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+# workaround for ENOS configuration
+if [ ! -d /var/lib/dpkg/alternatives ]; then
+	mkdir -p /var/lib/dpkg/alternatives
+fi
+if [ ! -d /etc/alternatives ]; then
+	mkdir /etc/alternatives
+fi
+if [ ! -f /var/lib/dpkg/diversions ]; then
+	touch /var/lib/dpkg/diversions
+fi
+
+update-alternatives --install /usr/bin/pager pager /bin/more 10
+update-alternatives --install /usr/bin/awk awk /bin/busybox 1
+update-alternatives --install /usr/bin/vi vi /bin/busybox 1
+dpkg-divert --package busybox --add /bin/sh

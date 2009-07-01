@@ -1,0 +1,76 @@
+
+BusyBox Debian packaging Howto for Maemo
+========================================
+
+This is a howto for creating optimal match between BusyBox
+Debian package configuration and the upstream Debian packages
+which BusyBox replaces.
+
+Files:
+
+- README -- this file
+- create-control.py -- script to create BusyBox packaging files
+- check-links.py -- script for checking at package build whether
+                    the packaging files match BusyBox created link list
+- debian-mappings.txt -- mappings between BusyBox and Debian packages,
+                         needed by the script
+- busybox-notes.txt -- some extra notes about Debian vs. (Maemo)
+                       BusyBox differences
+- *.dirs -- extra packaging files needed in addition to ones
+            created by the script
+
+
+What updates are needed and when/where:
+
+When Packaging info needs to be changed (maintainer etc):
+-> Updating control file content excerpts in the beginning
+   of create-control.py
+
+When whole Maemo syncs to newer upstream Debian version (every 3 years?):
+-> Updating debian-mappings.txt according to changes in Debian (if any)
+
+When BusyBox configuration needs to be changed (after corresponding
+architecture ticket is accepted):
+-> Iterate through the steps below.  Replace the earlier package
+   control, *.links, *.postinst and *.prerm files with ones created
+   by create-control.py
+
+
+BusyBox configuration update steps:
+
+1. Enable/disable relevant things from BusyBox config
+	vi debian/config/config.maemo
+
+2. Create initial control, postinst & links files for BusyBox
+   packages based on this config file:
+	cd debian/scripts
+	./create-control.py -c ../config/config.maemo debian-mappings.txt
+
+3. If any errors were reported, add the missing BB binaries
+   to Debian mappings and repeat from 1).  May be needed if later
+   (>1.11) BusyBox versions have new binaries that are enabled
+
+4. Build BusyBox:
+	cd ../..
+	dpkg-buildpackage -rfakeroot -b -uc
+
+5. Create updated control, postinst & links files for BusyBox
+   packages based on the BusyBox links file:
+	cd debian/scripts
+	./create-control.py -l ../build/build_maemo/busybox.links debian-mappings.txt
+
+6. Update BusyBox config (or mappings file) to fix the relevant
+   issues and repeat from 4) until no relevant warnings are given
+
+7. Overwrite previous packagaging with the new one:
+	cp *.dirs ../; mv control *.{links,postinst,prerm} ../
+
+8. Cross-check from debian/rules file that everything is up to date.
+   Manually you can do it like this:
+	cd ..
+	scripts/check-links.py build/build_maemo/busybox.links *.links
+
+NOTE: The script cannot deduce all the symlinks based on BusyBox
+configuration at step 2), that's why BB config is used only for
+initial configuration and rest of the checks at step 5) are done
+based on the links file created by the BusyBox build.

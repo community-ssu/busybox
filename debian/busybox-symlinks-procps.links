@@ -1,0 +1,8 @@
+bin/busybox usr/bin/free
+bin/busybox bin/kill
+bin/busybox usr/bin/pgrep
+bin/busybox usr/bin/pkill
+bin/busybox bin/ps
+bin/busybox usr/bin/top
+bin/busybox usr/bin/uptime
+bin/busybox usr/bin/watch

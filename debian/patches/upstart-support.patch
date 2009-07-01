@@ -1,0 +1,62 @@
+From 04522f492dc25d650c22e2d4a11296e72fa40e32 Mon Sep 17 00:00:00 2001
+From: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+Date: Wed, 17 Jun 2009 16:01:31 +0300
+Subject: [PATCH] Call telinit for normal reboot/shutdown.
+
+Signed-off-by: Alexander Shishkin <ext-alexander.shishkin@nokia.com>
+---
+ init/Config.in |   14 ++++++++++++++
+ init/halt.c    |   12 ++++++++++++
+ 2 files changed, 26 insertions(+), 0 deletions(-)
+
+diff --git a/init/Config.in b/init/Config.in
+index 25f4390..ea91b45 100644
+--- a/init/Config.in
++++ b/init/Config.in
+@@ -12,6 +12,20 @@ config INIT
+ 	help
+ 	  init is the first program run when the system boots.
+ 
++config CALL_TELINIT
++	bool "Call telinit on shutdown and reboot"
++	help
++	  What I just said
++
++config TELINIT_PATH
++	string "Path to telinit executable"
++	default "/sbin/telinit"
++	depends on CALL_TELINIT
++	help
++	  When busybox halt and friends have to call external telinit
++	  to facilitate proper shutdown, this path is to be used when
++	  locating telinit executable.
++
+ config DEBUG_INIT
+ 	bool "Debugging aid"
+ 	default n
+diff --git a/init/halt.c b/init/halt.c
+index c14f0f2..b877be1 100644
+--- a/init/halt.c
++++ b/init/halt.c
+@@ -84,6 +84,18 @@ RB_AUTOBOOT
+ 		}
+ 		if (rc)
+ 			rc = kill(1, signals[which]);
++	} else if (ENABLE_CALL_TELINIT && !(flags & 4)) {
++		/* runlevels:
++		 * 0 == shutdown
++		 * 6 == reboot */
++		const char *telinit_argv[] = {
++			"telinit",
++			which == 2 ? "6" : "0",
++			NULL
++		};
++
++		forkexit_or_rexec();
++		execve(CONFIG_TELINIT_PATH, telinit_argv, environ);
+ 	} else
+ 		rc = reboot(magic[which]);
+ 
+-- 
+1.6.3.1
+
