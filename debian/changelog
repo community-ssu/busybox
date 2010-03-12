@@ -1,9 +1,21 @@
-busybox (3:1.10.2.legal-1osso26+0m5) unstable; urgency=low
+busybox (3:1.10.2.legal-1osso30+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
-    Suffix +0m5 added to package revision
+    version has been changed to 3:1.10.2.legal-1osso30+0m5
 
- -- Attiq Malik <ext-attiq.1.malik@nokia.com>  Wed, 01 Jul 2009 13:11:49 +0300
+ -- Lyubimkin Eugene <ext-lyubimkin.eugene@nokia.com>  Fri, 12 Mar 2010 10:49:27 +0200
+
+busybox (3:1.10.2.legal-1osso30) unstable; urgency=low
+
+  * Fixes: NB#160158 - Device doesn't boot up after 1.1.1 -> 1.2 SSU
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Fri, 12 Mar 2010 10:11:20 +0200
+
+busybox (3:1.10.2.legal-1osso29) unstable; urgency=low
+
+  * Fixes: NB#157159 -  Enable ar in busybox 
+
+ -- Eugene Lyubimkin <ext-lyubimkin.eugene@nokia.com>  Tue, 02 Mar 2010 11:09:43 +0200
 
 busybox (3:1.10.2.legal-1osso26) unstable; urgency=low
 

@@ -13,6 +13,8 @@ if [ ! -f /var/lib/dpkg/diversions ]; then
 fi
 
 update-alternatives --install /usr/bin/pager pager /bin/more 10
-update-alternatives --install /usr/bin/awk awk /bin/busybox 1
+# To facilitate upgrades when things go wrong, make awk explicitly
+# part of the package instead.
+#update-alternatives --install /usr/bin/awk awk /bin/busybox 1
 update-alternatives --install /usr/bin/vi vi /bin/busybox 1
 dpkg-divert --package busybox --add /bin/sh

@@ -43,6 +43,7 @@ bin/busybox sbin/losetup
 bin/busybox sbin/mkswap
 bin/busybox sbin/swapoff
 bin/busybox sbin/swapon
+bin/busybox usr/bin/awk
 bin/busybox usr/bin/basename
 bin/busybox usr/bin/cksum
 bin/busybox usr/bin/clear

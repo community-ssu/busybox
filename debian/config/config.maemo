@@ -95,8 +95,8 @@ CONFIG_IOCTL_HEX2STR_ERROR=y
 #
 # Archival Utilities
 #
-# CONFIG_AR is not set
-# CONFIG_FEATURE_AR_LONG_FILENAMES is not set
+CONFIG_AR=y
+CONFIG_FEATURE_AR_LONG_FILENAMES=y
 # CONFIG_BUNZIP2 is not set
 # CONFIG_BZIP2 is not set
 # CONFIG_CPIO is not set

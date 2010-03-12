@@ -27,6 +27,7 @@ Description: Tiny utilities for small and embedded systems
  - symlinks for tools included into it that correspond to binaries
    in essential Debian packages
  - alternatives from packages that don't have anything else
+ - awk, as a reminder that alternatives don't always work as expected
  .
  Symlinks to other tools included into BusyBox which correspond to binaries
  in non-essential Debian packages are provided in separate symlink packages.
@@ -47,6 +48,14 @@ Description: BusyBox specific symlinks
  BusyBox symlinks for utilities without counterparts in Debian.
  These are in separate package because they aren't essentials
  (e.g. needed for system package upgrades).
+
+Package: busybox-symlinks-binutils
+Architecture: all
+Provides: binutils
+Replaces: binutils
+Conflicts: binutils
+Description: BusyBox symlinks to provide 'binutils'
+ BusyBox symlinks for utilities corresponding to 'binutils' package.
 
 Package: busybox-symlinks-console-tools
 Architecture: all
