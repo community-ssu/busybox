@@ -1,0 +1,26 @@
+From 19849142502587c152355a5bd5b66c48533efce3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+Date: Sat, 7 Jul 2012 11:02:16 +0200
+Subject: [PATCH] Disable redrawing lineedit window after SIGWINCH signal.
+ This fix portrait mode in busybox shell.
+
+---
+ libbb/lineedit.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libbb/lineedit.c b/libbb/lineedit.c
+index b05319a..7309b97 100644
+--- a/libbb/lineedit.c
++++ b/libbb/lineedit.c
+@@ -1299,7 +1299,7 @@ static void win_changed(int nsig)
+ {
+ 	int width;
+ 	get_terminal_width_height(0, &width, NULL);
+-	cmdedit_setwidth(width, nsig /* - just a yes/no flag */);
++	cmdedit_setwidth(width, 0 /* - just a yes/no flag */);
+ 	if (nsig == SIGWINCH)
+ 		signal(SIGWINCH, win_changed); /* rearm ourself */
+ }
+-- 
+1.7.9.5
+

@@ -14,3 +14,4 @@ shell-hist.patch
 top-display-rss.patch
 ls-s-dont-follow-links.patch
 upstart-support.patch
+busybox-portrait.patch
