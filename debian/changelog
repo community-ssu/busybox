@@ -1,3 +1,9 @@
+busybox (3:1.10.2.legal-1osso31+0cssu0) unstable; urgency=low
+
+  * Disable redrawing lineedit window after SIGWINCH signal. This fix portrait mode in busybox shell.
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Mon, 16 Jul 2012 10:13:14 +0200
+
 busybox (3:1.10.2.legal-1osso30+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
